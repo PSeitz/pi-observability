@@ -20,13 +20,13 @@
 
 import { homedir } from "node:os";
 import { join } from "node:path";
-import type { AssistantMessage } from "@mariozechner/pi-ai";
+import type { AssistantMessage } from "@earendil-works/pi-ai";
 import type {
   ExtensionAPI,
   ExtensionContext,
   Theme as PiTheme,
-} from "@mariozechner/pi-coding-agent";
-import { Key, matchesKey, SettingsList, truncateToWidth, visibleWidth } from "@mariozechner/pi-tui";
+} from "@earendil-works/pi-coding-agent";
+import { Key, matchesKey, SettingsList, truncateToWidth, visibleWidth } from "@earendil-works/pi-tui";
 
 import {
   loadSettings,

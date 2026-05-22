@@ -1,4 +1,4 @@
-import type { ContextUsage, Theme as PiTheme } from "@mariozechner/pi-coding-agent";
+import type { ContextUsage, Theme as PiTheme } from "@earendil-works/pi-coding-agent";
 
 export type SegmentKey =
   | "modelThink"

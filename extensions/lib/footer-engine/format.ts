@@ -1,5 +1,5 @@
 import { homedir } from "node:os";
-import type { ThemeColor } from "@mariozechner/pi-coding-agent";
+import type { ThemeColor } from "@earendil-works/pi-coding-agent";
 
 export function fmtDuration(ms: number): string {
   if (!Number.isFinite(ms) || ms < 0) ms = 0;

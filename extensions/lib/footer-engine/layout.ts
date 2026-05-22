@@ -1,4 +1,4 @@
-import { visibleWidth, truncateToWidth } from "@mariozechner/pi-tui";
+import { visibleWidth, truncateToWidth } from "@earendil-works/pi-tui";
 import type { LayoutAssembler } from "./types.js";
 
 export const defaultAssembler: LayoutAssembler = (segments, width, theme) => {
