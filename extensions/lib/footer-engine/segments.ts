@@ -11,12 +11,13 @@ import {
 
 export const builtinRenderers: Record<string, SegmentRenderer> = {
   modelThink(input) {
-    const { model, thinkingLevel, theme } = input;
+    const { model, thinkingLevel, fastModeEnabled, serviceTier, theme } = input;
     const text = `${model}:${thinkingLevel}`;
+    const tier = fastModeEnabled ? theme.fg("accent", ` ⚡${serviceTier ?? "fast"}`) : "";
     if (thinkingLevel === "xhigh" || thinkingLevel === "max") {
-      return rainbowText(text);
+      return rainbowText(text) + tier;
     }
-    return theme.fg(thinkingColor(thinkingLevel), text);
+    return theme.fg(thinkingColor(thinkingLevel), text) + tier;
   },
 
   runtime(input) {

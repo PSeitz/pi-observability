@@ -26,7 +26,13 @@ import type {
   ExtensionContext,
   Theme as PiTheme,
 } from "@earendil-works/pi-coding-agent";
-import { Key, matchesKey, SettingsList, truncateToWidth, visibleWidth } from "@earendil-works/pi-tui";
+import {
+  Key,
+  matchesKey,
+  SettingsList,
+  truncateToWidth,
+  visibleWidth,
+} from "@earendil-works/pi-tui";
 
 import {
   loadSettings,
@@ -127,18 +133,20 @@ function getStringProp(value: unknown, key: string): string | undefined {
 
 function getServiceTierFromPayload(payload: unknown): string | null {
   const tier = getStringProp(payload, "service_tier") ?? getStringProp(payload, "serviceTier");
-  return tier?.trim() || null;
+  return tier?.trim().toLowerCase() || null;
+}
+
+function isFastServiceTier(serviceTier: string | null): boolean {
+  // OpenAI's actual fast/priority tier is `priority`. Older/local shims may
+  // still emit `fast`, so keep accepting it for backwards-compatible display.
+  return serviceTier === "priority" || serviceTier === "fast";
 }
 
 function supportsFastMode(ctx: ExtensionContext): boolean {
   const model = ctx.model;
   if (!model) return false;
-  if (model.api !== "openai-codex-responses") return false;
-  return (
-    model.provider === "openai-codex" ||
-    model.provider === "openai" ||
-    model.id.toLowerCase().includes("gpt-5.5")
-  );
+  if (model.provider !== "openai" && model.provider !== "openai-codex") return false;
+  return model.api === "openai-responses" || model.api === "openai-codex-responses";
 }
 
 /* ───── Dashboard formatting ───── */
@@ -168,6 +176,9 @@ function buildDashboard(
     branch
       ? `Branch: ${branch}    Model: ${ctx.model?.id ?? "none"}`
       : `Model: ${ctx.model?.id ?? "none"}`,
+    state.serviceTier
+      ? `Service tier: ${state.serviceTier}${state.fastModeEnabled ? " (fast)" : ""}`
+      : `Fast mode: ${state.fastModeSupported ? "available" : "not available"}`,
     `Tokens: ↑${fmtTokens(totalIn)} ↓${fmtTokens(totalOut)}`,
     `Cost: $${totalCost.toFixed(6)}`,
   ];
@@ -345,8 +356,8 @@ export default function (pi: ExtensionAPI) {
   });
 
   pi.on("before_provider_request", async (event, ctx) => {
-    state.serviceTier = getServiceTierFromPayload(event.payload)?.toLowerCase() ?? null;
-    state.fastModeEnabled = state.serviceTier === "fast";
+    state.serviceTier = getServiceTierFromPayload(event.payload);
+    state.fastModeEnabled = isFastServiceTier(state.serviceTier);
     state.fastModeSupported = supportsFastMode(ctx) || state.fastModeEnabled;
   });
 
@@ -539,6 +550,9 @@ export default function (pi: ExtensionAPI) {
             totalInputTokens: totalIn,
             totalOutputTokens: totalOut,
             totalCost,
+            fastModeSupported: state.fastModeSupported,
+            fastModeEnabled: state.fastModeEnabled,
+            serviceTier: state.serviceTier,
             contextUsage: ctx.getContextUsage() ?? null,
             cwd: ctx.cwd,
             showFullPath: state.showFullPath,

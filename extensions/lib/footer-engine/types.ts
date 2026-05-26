@@ -29,6 +29,9 @@ export interface FooterInput {
   totalInputTokens: number;
   totalOutputTokens: number;
   totalCost: number;
+  fastModeSupported: boolean;
+  fastModeEnabled: boolean;
+  serviceTier: string | null;
   contextUsage: ContextUsage | null;
   cwd: string;
   showFullPath: boolean;
