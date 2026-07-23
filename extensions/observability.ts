@@ -470,8 +470,13 @@ export default function (pi: ExtensionAPI) {
     };
 
     const historyStore = storage.jsonl<SessionSummary>("history");
-    await historyStore.append(summary);
-    await historyStore.trim({ keepLast: 10 });
+    try {
+      await historyStore.append(summary);
+      await historyStore.trim({ keepLast: 10 });
+    } catch (err) {
+      // Storage failure must never break session shutdown.
+      console.error("[observability] failed to persist session history:", err);
+    }
   });
 
   /* ─── Footer ─── */

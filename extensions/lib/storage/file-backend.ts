@@ -1,4 +1,5 @@
-import { mkdir, readFile, rename, writeFile, appendFile } from "node:fs/promises";
+import { mkdir, readFile, rename, unlink, writeFile, appendFile } from "node:fs/promises";
+import { randomUUID } from "node:crypto";
 import { join } from "node:path";
 import type { RawBackend } from "./types.js";
 
@@ -32,9 +33,24 @@ export function createFileBackend(options: FileBackendOptions): RawBackend {
     async write(name, content) {
       await ensureDir();
       const target = pathFor(name);
-      const temp = `${target}.tmp`;
-      await writeFile(temp, content, "utf8");
-      await rename(temp, target);
+      // Unique temp name per process/call: concurrent sessions sharing this
+      // directory must not clobber each other's temp file (rename ENOENT).
+      const temp = `${target}.${process.pid}.${randomUUID()}.tmp`;
+      try {
+        await writeFile(temp, content, "utf8");
+        await rename(temp, target);
+      } catch (err) {
+        if ((err as NodeJS.ErrnoException).code === "ENOENT") {
+          // Directory may have been removed after ensureDir() cached it.
+          ensured = false;
+          await ensureDir();
+          await writeFile(temp, content, "utf8");
+          await rename(temp, target);
+          return;
+        }
+        await unlink(temp).catch(() => {});
+        throw err;
+      }
     },
 
     async append(name, line) {
