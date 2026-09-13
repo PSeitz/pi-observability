@@ -44,7 +44,7 @@ export const builtinRenderers: Record<string, SegmentRenderer> = {
     if (!contextUsage || !contextUsage.contextWindow) return "";
 
     const tokens = contextUsage.tokens || 0;
-    const max = settings.contextScaleTokens ?? contextUsage.contextWindow;
+    const max = contextUsage.contextWindow;
     const pct = Math.min(100, Math.max(0, Math.round((tokens / max) * 100)));
 
     let text = "ctx";
@@ -65,10 +65,15 @@ export const builtinRenderers: Record<string, SegmentRenderer> = {
       text += ` ${fmtTokens(tokens)}/${fmtTokens(max)}`;
     }
 
-    return theme.fg(
-      contextUsageColor(pct, settings.contextZones.expert, settings.contextZones.warning),
-      text,
-    );
+    const color = settings.contextTokenThresholds
+      ? tokens >= settings.contextTokenThresholds.red
+        ? "error"
+        : tokens >= settings.contextTokenThresholds.yellow
+          ? "warning"
+          : "success"
+      : contextUsageColor(pct, settings.contextZones.expert, settings.contextZones.warning);
+
+    return theme.fg(color, text);
   },
 
   tokens(input) {

@@ -58,7 +58,7 @@ export function validateSettings(raw: unknown): SettingsConfig {
   const preset = isPresetName(r.preset) ? r.preset : DEFAULT_SETTINGS.preset;
   const segments = validateSegments(r.segments);
   const contextZones = validateZones(r.contextZones);
-  const contextScaleTokens = validateContextScale(r.contextScaleTokens);
+  const contextTokenThresholds = validateContextTokenThresholds(r.contextTokenThresholds);
   const endOfRunNotification =
     typeof r.endOfRunNotification === "boolean"
       ? r.endOfRunNotification
@@ -69,7 +69,7 @@ export function validateSettings(raw: unknown): SettingsConfig {
     preset,
     segments,
     contextZones,
-    contextScaleTokens,
+    contextTokenThresholds,
     endOfRunNotification,
   };
 }
@@ -130,8 +130,10 @@ export function updateSetting(
       next = setZone(next, "warning", parseInt(value, 10));
       break;
     }
-    case "contextScaleTokens": {
-      next.contextScaleTokens = value === "model" ? null : validateContextScale(Number(value));
+    case "contextTokenThresholds": {
+      const [yellow, red] = value.split("/").map(Number);
+      next.contextTokenThresholds =
+        value === "percentage" ? null : validateContextTokenThresholds({ yellow, red });
       break;
     }
     case "endOfRunNotification": {
@@ -158,8 +160,20 @@ function validateSegments(raw: unknown): Record<SegmentKey, boolean> {
   return segments;
 }
 
-function validateContextScale(raw: unknown): number | null {
-  return typeof raw === "number" && Number.isFinite(raw) && raw > 0 ? Math.round(raw) : null;
+function validateContextTokenThresholds(raw: unknown): { yellow: number; red: number } | null {
+  if (!raw || typeof raw !== "object") return null;
+  const { yellow, red } = raw as Record<string, unknown>;
+  if (
+    typeof yellow !== "number" ||
+    typeof red !== "number" ||
+    !Number.isFinite(yellow) ||
+    !Number.isFinite(red) ||
+    yellow <= 0 ||
+    red <= yellow
+  ) {
+    return null;
+  }
+  return { yellow: Math.round(yellow), red: Math.round(red) };
 }
 
 function validateZones(raw: unknown): { expert: number; warning: number } {

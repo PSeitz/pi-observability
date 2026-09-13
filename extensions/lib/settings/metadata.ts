@@ -17,7 +17,7 @@ export const DEFAULT_SETTINGS: SettingsConfig = {
     cost: true,
   },
   contextZones: { expert: 70, warning: 85 },
-  contextScaleTokens: null,
+  contextTokenThresholds: null,
   endOfRunNotification: true,
 };
 
@@ -112,7 +112,13 @@ export const SEGMENT_METADATA: SegmentMetadata[] = [
 
 export const ZONE_VALUE_OPTIONS = {
   expert: ["60", "65", "70", "75", "80"],
-  warning: ["75", "80", "85", "90", "95", "99"],
+  warning: ["75", "80", "85", "90", "95"],
 };
 
-export const CONTEXT_SCALE_OPTIONS = ["model", "50000", "100000", "200000"];
+export const CONTEXT_TOKEN_THRESHOLD_OPTIONS = [
+  "percentage",
+  "50000/75000",
+  "70000/100000",
+  "75000/100000",
+  "100000/150000",
+];

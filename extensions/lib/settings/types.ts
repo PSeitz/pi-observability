@@ -18,7 +18,7 @@ export interface SettingsConfig {
   preset: PresetName;
   segments: Record<SegmentKey, boolean>;
   contextZones: { expert: number; warning: number };
-  contextScaleTokens: number | null;
+  contextTokenThresholds: { yellow: number; red: number } | null;
   endOfRunNotification: boolean;
 }
 

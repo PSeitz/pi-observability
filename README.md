@@ -66,7 +66,7 @@ Individual segments you can toggle:
 - **Cost** — Estimated session cost
 - **End-of-run TPS notification** — Can be enabled or disabled independently
 
-The context percentage scale is configurable. By default, 100% is the active model's context window; it can instead be fixed at 50k, 100k, or 200k tokens.
+The context percentage always uses the active model's context window. Colors can use the percentage zones below or configurable absolute yellow/red token thresholds.
 
 Context-usage color zones (configurable):
 
