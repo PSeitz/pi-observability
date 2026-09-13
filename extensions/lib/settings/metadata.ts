@@ -16,8 +16,7 @@ export const DEFAULT_SETTINGS: SettingsConfig = {
     tps: true,
     cost: true,
   },
-  contextZones: { expert: 70, warning: 85 },
-  contextTokenThresholds: null,
+  contextTokenThresholds: { yellow: 70_000, red: 100_000 },
   endOfRunNotification: true,
 };
 
@@ -108,17 +107,4 @@ export const SEGMENT_METADATA: SegmentMetadata[] = [
   { id: "tokens", label: "Session Tokens", description: "Show total input/output token counts" },
   { id: "tps", label: "TPS (Tokens/Sec)", description: "Show live and last-turn TPS" },
   { id: "cost", label: "Cost", description: "Show estimated session cost" },
-];
-
-export const ZONE_VALUE_OPTIONS = {
-  expert: ["60", "65", "70", "75", "80"],
-  warning: ["75", "80", "85", "90", "95"],
-};
-
-export const CONTEXT_TOKEN_THRESHOLD_OPTIONS = [
-  "percentage",
-  "50000/75000",
-  "70000/100000",
-  "75000/100000",
-  "100000/150000",
 ];

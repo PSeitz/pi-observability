@@ -1,9 +1,15 @@
-import {
-  CONTEXT_TOKEN_THRESHOLD_OPTIONS,
-  SEGMENT_METADATA,
-  ZONE_VALUE_OPTIONS,
-} from "./metadata.js";
+import { Input } from "@earendil-works/pi-tui";
+import { SEGMENT_METADATA } from "./metadata.js";
 import type { SettingsConfig, SettingsListItem } from "./types.js";
+
+function tokenInput(currentValue: string, done: (selectedValue?: string) => void): Input {
+  const input = new Input({ prompt: "Tokens: " });
+  input.setValue(currentValue);
+  input.focused = true;
+  input.onSubmit = (value) => done(value.trim());
+  input.onEscape = () => done();
+  return input;
+}
 
 export function toSettingsListItems(config: SettingsConfig): SettingsListItem[] {
   const items: SettingsListItem[] = [
@@ -36,28 +42,18 @@ export function toSettingsListItems(config: SettingsConfig): SettingsListItem[] 
       values: ["true", "false"],
     },
     {
-      id: "contextTokenThresholds",
-      label: "Context Color Thresholds",
-      description: "Yellow/red token limits, or use percentage thresholds",
-      currentValue:
-        config.contextTokenThresholds === null
-          ? "percentage"
-          : `${config.contextTokenThresholds.yellow}/${config.contextTokenThresholds.red}`,
-      values: CONTEXT_TOKEN_THRESHOLD_OPTIONS,
+      id: "contextYellowTokens",
+      label: "Yellow Context Limit",
+      description: "Context token count where the footer turns yellow",
+      currentValue: `${config.contextTokenThresholds.yellow}`,
+      submenu: tokenInput,
     },
     {
-      id: "expertZone",
-      label: "Expert Zone Threshold",
-      description: "Context usage percentage where the bar turns green (0-100)",
-      currentValue: `${config.contextZones.expert}`,
-      values: ZONE_VALUE_OPTIONS.expert,
-    },
-    {
-      id: "warningZone",
-      label: "Warning Zone Threshold",
-      description: "Context usage percentage where the bar turns yellow (0-100)",
-      currentValue: `${config.contextZones.warning}`,
-      values: ZONE_VALUE_OPTIONS.warning,
+      id: "contextRedTokens",
+      label: "Red Context Limit",
+      description: "Context token count where the footer turns red",
+      currentValue: `${config.contextTokenThresholds.red}`,
+      submenu: tokenInput,
     },
   );
 

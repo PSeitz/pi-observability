@@ -7,14 +7,7 @@ export type {
   FooterEngineOptions,
 } from "./types.js";
 
-export {
-  fmtDuration,
-  fmtTokens,
-  shortenPath,
-  thinkingColor,
-  contextUsageColor,
-  rainbowText,
-} from "./format.js";
+export { fmtDuration, fmtTokens, shortenPath, thinkingColor, rainbowText } from "./format.js";
 
 export { builtinRenderers } from "./segments.js";
 export { defaultAssembler } from "./layout.js";

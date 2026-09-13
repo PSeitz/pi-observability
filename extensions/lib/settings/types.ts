@@ -1,3 +1,5 @@
+import type { Component } from "@earendil-works/pi-tui";
+
 export type SegmentKey =
   | "modelThink"
   | "runtime"
@@ -17,8 +19,7 @@ export interface SettingsConfig {
   version: number;
   preset: PresetName;
   segments: Record<SegmentKey, boolean>;
-  contextZones: { expert: number; warning: number };
-  contextTokenThresholds: { yellow: number; red: number } | null;
+  contextTokenThresholds: { yellow: number; red: number };
   endOfRunNotification: boolean;
 }
 
@@ -27,7 +28,11 @@ export interface SettingsListItem {
   label: string;
   description: string;
   currentValue: string;
-  values: string[];
+  values?: string[];
+  submenu?: (
+    currentValue: string,
+    done: (selectedValue?: string, options?: { navigateTo?: string }) => void,
+  ) => Component;
 }
 
 export interface SettingsUpdateResult {

@@ -15,8 +15,7 @@ export type SegmentKey =
 
 export interface FooterSettings {
   segments: Record<SegmentKey, boolean>;
-  contextZones: { expert: number; warning: number };
-  contextTokenThresholds: { yellow: number; red: number } | null;
+  contextTokenThresholds: { yellow: number; red: number };
 }
 
 export interface FooterInput {

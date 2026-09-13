@@ -31,24 +31,6 @@ export function setSegment(
   return next;
 }
 
-export function setZone(
-  config: SettingsConfig,
-  key: "expert" | "warning",
-  value: number,
-): SettingsConfig {
-  const next = structuredClone(config);
-  next.contextZones[key] = Math.max(0, Math.min(100, value));
-  // Ensure expert <= warning
-  if (next.contextZones.expert > next.contextZones.warning) {
-    if (key === "expert") {
-      next.contextZones.warning = next.contextZones.expert;
-    } else {
-      next.contextZones.expert = next.contextZones.warning;
-    }
-  }
-  return next;
-}
-
 export function validateSettings(raw: unknown): SettingsConfig {
   if (!raw || typeof raw !== "object") {
     return createDefaultSettings();
@@ -57,7 +39,6 @@ export function validateSettings(raw: unknown): SettingsConfig {
 
   const preset = isPresetName(r.preset) ? r.preset : DEFAULT_SETTINGS.preset;
   const segments = validateSegments(r.segments);
-  const contextZones = validateZones(r.contextZones);
   const contextTokenThresholds = validateContextTokenThresholds(r.contextTokenThresholds);
   const endOfRunNotification =
     typeof r.endOfRunNotification === "boolean"
@@ -68,7 +49,6 @@ export function validateSettings(raw: unknown): SettingsConfig {
     version: 1,
     preset,
     segments,
-    contextZones,
     contextTokenThresholds,
     endOfRunNotification,
   };
@@ -122,18 +102,22 @@ export function updateSetting(
       }
       break;
     }
-    case "expertZone": {
-      next = setZone(next, "expert", parseInt(value, 10));
+    case "contextYellowTokens": {
+      const tokens = parseTokenCount(value);
+      if (tokens !== null && tokens < next.contextTokenThresholds.red) {
+        next.contextTokenThresholds.yellow = tokens;
+      } else {
+        derivedUpdates.push({ id, value: `${config.contextTokenThresholds.yellow}` });
+      }
       break;
     }
-    case "warningZone": {
-      next = setZone(next, "warning", parseInt(value, 10));
-      break;
-    }
-    case "contextTokenThresholds": {
-      const [yellow, red] = value.split("/").map(Number);
-      next.contextTokenThresholds =
-        value === "percentage" ? null : validateContextTokenThresholds({ yellow, red });
+    case "contextRedTokens": {
+      const tokens = parseTokenCount(value);
+      if (tokens !== null && tokens > next.contextTokenThresholds.yellow) {
+        next.contextTokenThresholds.red = tokens;
+      } else {
+        derivedUpdates.push({ id, value: `${config.contextTokenThresholds.red}` });
+      }
       break;
     }
     case "endOfRunNotification": {
@@ -160,8 +144,10 @@ function validateSegments(raw: unknown): Record<SegmentKey, boolean> {
   return segments;
 }
 
-function validateContextTokenThresholds(raw: unknown): { yellow: number; red: number } | null {
-  if (!raw || typeof raw !== "object") return null;
+function validateContextTokenThresholds(raw: unknown): { yellow: number; red: number } {
+  if (!raw || typeof raw !== "object") {
+    return structuredClone(DEFAULT_SETTINGS.contextTokenThresholds);
+  }
   const { yellow, red } = raw as Record<string, unknown>;
   if (
     typeof yellow !== "number" ||
@@ -171,29 +157,12 @@ function validateContextTokenThresholds(raw: unknown): { yellow: number; red: nu
     yellow <= 0 ||
     red <= yellow
   ) {
-    return null;
+    return structuredClone(DEFAULT_SETTINGS.contextTokenThresholds);
   }
   return { yellow: Math.round(yellow), red: Math.round(red) };
 }
 
-function validateZones(raw: unknown): { expert: number; warning: number } {
-  const zones = { ...DEFAULT_SETTINGS.contextZones };
-  if (!raw || typeof raw !== "object") return zones;
-  const r = raw as Record<string, unknown>;
-
-  if (typeof r.expert === "number") zones.expert = clamp(0, r.expert, 100);
-  if (typeof r.warning === "number") zones.warning = clamp(0, r.warning, 100);
-
-  // Ensure expert <= warning
-  if (zones.expert > zones.warning) {
-    const avg = Math.round((zones.expert + zones.warning) / 2);
-    zones.expert = avg;
-    zones.warning = avg;
-  }
-
-  return zones;
-}
-
-function clamp(min: number, val: number, max: number): number {
-  return Math.max(min, Math.min(max, val));
+function parseTokenCount(value: string): number | null {
+  const tokens = Number(value.replaceAll(",", "").replaceAll("_", ""));
+  return Number.isFinite(tokens) && tokens > 0 ? Math.round(tokens) : null;
 }

@@ -66,15 +66,12 @@ Individual segments you can toggle:
 - **Cost** — Estimated session cost
 - **End-of-run TPS notification** — Can be enabled or disabled independently
 
-The context percentage always uses the active model's context window. Colors can use the percentage zones below or configurable absolute yellow/red token thresholds.
+The context percentage always uses the active model's context window. Enter independent token limits for the yellow and red context colors in `/obs-settings`.
 
-Context-usage color zones (configurable):
-
-| Zone | Default | Color |
-|------|---------|-------|
-| Normal | ≤ 70% | Green |
-| Expert | 71–85% | Yellow |
-| Warning | > 85% | Red |
+| Setting | Default |
+|---------|---------|
+| Yellow Context Limit | 70,000 tokens |
+| Red Context Limit | 100,000 tokens |
 
 ### Dashboard (`/obs`)
 

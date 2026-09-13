@@ -316,8 +316,7 @@ export default function (pi: ExtensionAPI) {
         tps: true,
         cost: true,
       },
-      contextZones: { expert: 70, warning: 85 },
-      contextTokenThresholds: null,
+      contextTokenThresholds: { yellow: 70_000, red: 100_000 },
       endOfRunNotification: true,
     },
   };
