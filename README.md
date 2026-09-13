@@ -65,6 +65,8 @@ Individual segments you can toggle:
 - **TPS** — Live during streaming, last-turn when idle
 - **Cost** — Estimated session cost
 
+The context percentage scale is configurable. By default, 100% is the active model's context window; it can instead be fixed at 50k, 100k, or 200k tokens.
+
 Context-usage color zones (configurable):
 
 | Zone | Default | Color |

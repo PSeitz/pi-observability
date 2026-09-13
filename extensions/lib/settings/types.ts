@@ -18,6 +18,7 @@ export interface SettingsConfig {
   preset: PresetName;
   segments: Record<SegmentKey, boolean>;
   contextZones: { expert: number; warning: number };
+  contextScaleTokens: number | null;
 }
 
 export interface SettingsListItem {

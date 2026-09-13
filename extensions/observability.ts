@@ -317,6 +317,7 @@ export default function (pi: ExtensionAPI) {
         cost: true,
       },
       contextZones: { expert: 70, warning: 85 },
+      contextScaleTokens: null,
     },
   };
 

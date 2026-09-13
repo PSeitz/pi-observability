@@ -1,4 +1,4 @@
-import { SEGMENT_METADATA, ZONE_VALUE_OPTIONS } from "./metadata.js";
+import { CONTEXT_SCALE_OPTIONS, SEGMENT_METADATA, ZONE_VALUE_OPTIONS } from "./metadata.js";
 import type { SettingsConfig, SettingsListItem } from "./types.js";
 
 export function toSettingsListItems(config: SettingsConfig): SettingsListItem[] {
@@ -24,6 +24,13 @@ export function toSettingsListItems(config: SettingsConfig): SettingsListItem[] 
   }
 
   items.push(
+    {
+      id: "contextScaleTokens",
+      label: "Context Percentage Scale",
+      description: "Token count represented by 100%, or use the model context window",
+      currentValue: config.contextScaleTokens === null ? "model" : `${config.contextScaleTokens}`,
+      values: CONTEXT_SCALE_OPTIONS,
+    },
     {
       id: "expertZone",
       label: "Expert Zone Threshold",

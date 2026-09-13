@@ -44,7 +44,7 @@ export const builtinRenderers: Record<string, SegmentRenderer> = {
     if (!contextUsage || !contextUsage.contextWindow) return "";
 
     const tokens = contextUsage.tokens || 0;
-    const max = contextUsage.contextWindow;
+    const max = settings.contextScaleTokens ?? contextUsage.contextWindow;
     const pct = Math.min(100, Math.max(0, Math.round((tokens / max) * 100)));
 
     let text = "ctx";

@@ -7,7 +7,13 @@ export type {
   SegmentMetadata,
 } from "./types.js";
 
-export { DEFAULT_SETTINGS, PRESETS, SEGMENT_METADATA, ZONE_VALUE_OPTIONS } from "./metadata.js";
+export {
+  DEFAULT_SETTINGS,
+  PRESETS,
+  SEGMENT_METADATA,
+  ZONE_VALUE_OPTIONS,
+  CONTEXT_SCALE_OPTIONS,
+} from "./metadata.js";
 
 export {
   createDefaultSettings,

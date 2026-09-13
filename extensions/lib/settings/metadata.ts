@@ -17,6 +17,7 @@ export const DEFAULT_SETTINGS: SettingsConfig = {
     cost: true,
   },
   contextZones: { expert: 70, warning: 85 },
+  contextScaleTokens: null,
 };
 
 export const PRESETS: Record<PresetName, Partial<Record<SegmentKey, boolean>>> = {
@@ -110,5 +111,7 @@ export const SEGMENT_METADATA: SegmentMetadata[] = [
 
 export const ZONE_VALUE_OPTIONS = {
   expert: ["60", "65", "70", "75", "80"],
-  warning: ["75", "80", "85", "90", "95"],
+  warning: ["75", "80", "85", "90", "95", "99"],
 };
+
+export const CONTEXT_SCALE_OPTIONS = ["model", "50000", "100000", "200000"];

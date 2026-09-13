@@ -58,8 +58,9 @@ export function validateSettings(raw: unknown): SettingsConfig {
   const preset = isPresetName(r.preset) ? r.preset : DEFAULT_SETTINGS.preset;
   const segments = validateSegments(r.segments);
   const contextZones = validateZones(r.contextZones);
+  const contextScaleTokens = validateContextScale(r.contextScaleTokens);
 
-  return { version: 1, preset, segments, contextZones };
+  return { version: 1, preset, segments, contextZones, contextScaleTokens };
 }
 
 export function migrateSettings(raw: unknown): SettingsConfig {
@@ -118,6 +119,10 @@ export function updateSetting(
       next = setZone(next, "warning", parseInt(value, 10));
       break;
     }
+    case "contextScaleTokens": {
+      next.contextScaleTokens = value === "model" ? null : validateContextScale(Number(value));
+      break;
+    }
   }
 
   return { config: next, derivedUpdates };
@@ -136,6 +141,10 @@ function validateSegments(raw: unknown): Record<SegmentKey, boolean> {
     }
   }
   return segments;
+}
+
+function validateContextScale(raw: unknown): number | null {
+  return typeof raw === "number" && Number.isFinite(raw) && raw > 0 ? Math.round(raw) : null;
 }
 
 function validateZones(raw: unknown): { expert: number; warning: number } {
