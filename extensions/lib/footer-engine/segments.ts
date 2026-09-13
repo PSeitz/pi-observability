@@ -14,7 +14,17 @@ export const builtinRenderers: Record<string, SegmentRenderer> = {
   },
 
   runtime(input) {
-    return input.theme.fg("dim", `⏱ ${fmtDuration(input.runtimeMs)}`);
+    if (input.settings.clockMode === "Off") return "";
+    if (input.settings.clockMode === "Runtime") {
+      return input.theme.fg("dim", `⏱ ${fmtDuration(input.runtimeMs)}`);
+    }
+    if (input.lastProviderRequestTime === null) {
+      return input.theme.fg("dim", "⏱ --");
+    }
+
+    const elapsed = Date.now() - input.lastProviderRequestTime;
+    const cacheWindowMs = input.settings.cacheWindowMinutes * 60_000;
+    return input.theme.fg(elapsed >= cacheWindowMs ? "error" : "dim", `⏱ ${fmtDuration(elapsed)}`);
   },
 
   pwd(input) {

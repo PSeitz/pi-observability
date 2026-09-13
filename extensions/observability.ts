@@ -72,6 +72,7 @@ interface PersistedTurn {
 interface SessionState {
   startTime: number;
   turns: TurnRecord[];
+  lastProviderRequestTime: number | null;
   currentTurnStartTime: number | null;
   currentTurnUpdateCount: number;
   agentStartTime: number | null;
@@ -291,6 +292,7 @@ export default function (pi: ExtensionAPI) {
   const state: SessionState = {
     startTime: Date.now(),
     turns: [],
+    lastProviderRequestTime: null,
     currentTurnStartTime: null,
     currentTurnUpdateCount: 0,
     agentStartTime: null,
@@ -305,7 +307,6 @@ export default function (pi: ExtensionAPI) {
       preset: "standard",
       segments: {
         modelThink: true,
-        runtime: true,
         pwd: true,
         git: true,
         contextUsage: true,
@@ -316,6 +317,8 @@ export default function (pi: ExtensionAPI) {
         tps: true,
         cost: true,
       },
+      clockMode: "Runtime",
+      cacheWindowMinutes: 30,
       contextTokenThresholds: { yellow: 70_000, red: 100_000 },
       endOfRunNotification: true,
     },
@@ -326,6 +329,7 @@ export default function (pi: ExtensionAPI) {
   pi.on("session_start", async (_event, ctx) => {
     state.startTime = getSessionStartTime(ctx);
     state.turns = scanHistoricalTurns(ctx);
+    state.lastProviderRequestTime = null;
     state.currentTurnStartTime = null;
     state.currentTurnUpdateCount = 0;
     state.agentStartTime = null;
@@ -357,6 +361,7 @@ export default function (pi: ExtensionAPI) {
   });
 
   pi.on("before_provider_request", async (event, ctx) => {
+    state.lastProviderRequestTime = Date.now();
     state.serviceTier = getServiceTierFromPayload(event.payload);
     state.fastModeEnabled = isFastServiceTier(state.serviceTier);
     state.fastModeSupported = supportsFastMode(ctx) || state.fastModeEnabled;
@@ -549,6 +554,7 @@ export default function (pi: ExtensionAPI) {
             model: ctx.model?.id ?? "no-model",
             thinkingLevel: pi.getThinkingLevel(),
             runtimeMs: Date.now() - state.startTime,
+            lastProviderRequestTime: state.lastProviderRequestTime,
             isStreaming: state.isStreaming,
             currentTurnStartTime: state.currentTurnStartTime,
             currentTurnUpdateCount: state.currentTurnUpdateCount,

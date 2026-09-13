@@ -2,7 +2,6 @@ import type { Component } from "@earendil-works/pi-tui";
 
 export type SegmentKey =
   | "modelThink"
-  | "runtime"
   | "pwd"
   | "git"
   | "contextUsage"
@@ -14,11 +13,14 @@ export type SegmentKey =
   | "cost";
 
 export type PresetName = "minimal" | "standard" | "verbose" | "performance";
+export type ClockMode = "Runtime" | "Last Prompt" | "Off";
 
 export interface SettingsConfig {
   version: number;
   preset: PresetName;
   segments: Record<SegmentKey, boolean>;
+  clockMode: ClockMode;
+  cacheWindowMinutes: number;
   contextTokenThresholds: { yellow: number; red: number };
   endOfRunNotification: boolean;
 }

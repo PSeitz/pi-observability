@@ -1,5 +1,11 @@
 import { DEFAULT_SETTINGS, PRESETS } from "./metadata.js";
-import type { PresetName, SegmentKey, SettingsConfig, SettingsUpdateResult } from "./types.js";
+import type {
+  ClockMode,
+  PresetName,
+  SegmentKey,
+  SettingsConfig,
+  SettingsUpdateResult,
+} from "./types.js";
 
 export function createDefaultSettings(): SettingsConfig {
   return structuredClone(DEFAULT_SETTINGS);
@@ -39,6 +45,15 @@ export function validateSettings(raw: unknown): SettingsConfig {
 
   const preset = isPresetName(r.preset) ? r.preset : DEFAULT_SETTINGS.preset;
   const segments = validateSegments(r.segments);
+  const clockMode = isClockMode(r.clockMode)
+    ? r.clockMode
+    : getLegacyRuntimeEnabled(r.segments) === false
+      ? "Off"
+      : DEFAULT_SETTINGS.clockMode;
+  const cacheWindowMinutes = validatePositiveNumber(
+    r.cacheWindowMinutes,
+    DEFAULT_SETTINGS.cacheWindowMinutes,
+  );
   const contextTokenThresholds = validateContextTokenThresholds(r.contextTokenThresholds);
   const endOfRunNotification =
     typeof r.endOfRunNotification === "boolean"
@@ -49,6 +64,8 @@ export function validateSettings(raw: unknown): SettingsConfig {
     version: 1,
     preset,
     segments,
+    clockMode,
+    cacheWindowMinutes,
     contextTokenThresholds,
     endOfRunNotification,
   };
@@ -79,7 +96,6 @@ export function updateSetting(
       break;
     }
     case "modelThink":
-    case "runtime":
     case "pwd":
     case "git":
     case "contextUsage":
@@ -99,6 +115,19 @@ export function updateSetting(
         ] as SegmentKey[]) {
           derivedUpdates.push({ id: child, value: "false" });
         }
+      }
+      break;
+    }
+    case "clockMode": {
+      if (isClockMode(value)) next.clockMode = value;
+      break;
+    }
+    case "cacheWindowMinutes": {
+      const minutes = parsePositiveNumber(value);
+      if (minutes !== null) {
+        next.cacheWindowMinutes = minutes;
+      } else {
+        derivedUpdates.push({ id, value: `${config.cacheWindowMinutes}` });
       }
       break;
     }
@@ -127,6 +156,16 @@ export function updateSetting(
   }
 
   return { config: next, derivedUpdates };
+}
+
+function isClockMode(value: unknown): value is ClockMode {
+  return value === "Runtime" || value === "Last Prompt" || value === "Off";
+}
+
+function getLegacyRuntimeEnabled(segments: unknown): boolean | undefined {
+  if (!segments || typeof segments !== "object") return undefined;
+  const runtime = (segments as Record<string, unknown>).runtime;
+  return typeof runtime === "boolean" ? runtime : undefined;
 }
 
 function isPresetName(v: unknown): v is PresetName {
@@ -160,6 +199,15 @@ function validateContextTokenThresholds(raw: unknown): { yellow: number; red: nu
     return structuredClone(DEFAULT_SETTINGS.contextTokenThresholds);
   }
   return { yellow: Math.round(yellow), red: Math.round(red) };
+}
+
+function parsePositiveNumber(value: string): number | null {
+  const number = Number(value.trim());
+  return Number.isFinite(number) && number > 0 ? number : null;
+}
+
+function validatePositiveNumber(value: unknown, fallback: number): number {
+  return typeof value === "number" && Number.isFinite(value) && value > 0 ? value : fallback;
 }
 
 function parseTokenCount(value: string): number | null {

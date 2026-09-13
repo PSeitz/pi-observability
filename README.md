@@ -54,7 +54,7 @@ Run `/obs-settings` to open the interactive settings panel:
 Individual segments you can toggle:
 
 - **Model & Thinking** — Model name + thinking level
-- **Runtime** — Session timer
+- **Clock** — Session runtime, time since the last model request, or off. In Last Prompt mode it turns red after a configurable cache window (30 minutes by default).
 - **Working Directory** — Current folder or full path (`/obs-toggle-path`)
 - **Git Branch & Diff** — Branch name + added/removed line counts
 - **Context Usage** — Master toggle with 3 sub-options:

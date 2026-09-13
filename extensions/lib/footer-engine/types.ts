@@ -14,7 +14,9 @@ export type SegmentKey =
   | "cost";
 
 export interface FooterSettings {
-  segments: Record<SegmentKey, boolean>;
+  segments: Record<Exclude<SegmentKey, "runtime">, boolean>;
+  clockMode: "Runtime" | "Last Prompt" | "Off";
+  cacheWindowMinutes: number;
   contextTokenThresholds: { yellow: number; red: number };
 }
 
@@ -22,6 +24,7 @@ export interface FooterInput {
   model: string;
   thinkingLevel: string;
   runtimeMs: number;
+  lastProviderRequestTime: number | null;
   isStreaming: boolean;
   currentTurnStartTime: number | null;
   currentTurnUpdateCount: number;
