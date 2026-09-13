@@ -18,6 +18,7 @@ export const DEFAULT_SETTINGS: SettingsConfig = {
   },
   contextZones: { expert: 70, warning: 85 },
   contextScaleTokens: null,
+  endOfRunNotification: true,
 };
 
 export const PRESETS: Record<PresetName, Partial<Record<SegmentKey, boolean>>> = {

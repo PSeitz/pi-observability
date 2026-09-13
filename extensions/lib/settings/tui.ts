@@ -25,6 +25,13 @@ export function toSettingsListItems(config: SettingsConfig): SettingsListItem[] 
 
   items.push(
     {
+      id: "endOfRunNotification",
+      label: "End-of-Run TPS Notification",
+      description: "Show a TPS summary notification after each agent run",
+      currentValue: config.endOfRunNotification ? "true" : "false",
+      values: ["true", "false"],
+    },
+    {
       id: "contextScaleTokens",
       label: "Context Percentage Scale",
       description: "Token count represented by 100%, or use the model context window",

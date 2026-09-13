@@ -59,8 +59,19 @@ export function validateSettings(raw: unknown): SettingsConfig {
   const segments = validateSegments(r.segments);
   const contextZones = validateZones(r.contextZones);
   const contextScaleTokens = validateContextScale(r.contextScaleTokens);
+  const endOfRunNotification =
+    typeof r.endOfRunNotification === "boolean"
+      ? r.endOfRunNotification
+      : DEFAULT_SETTINGS.endOfRunNotification;
 
-  return { version: 1, preset, segments, contextZones, contextScaleTokens };
+  return {
+    version: 1,
+    preset,
+    segments,
+    contextZones,
+    contextScaleTokens,
+    endOfRunNotification,
+  };
 }
 
 export function migrateSettings(raw: unknown): SettingsConfig {
@@ -121,6 +132,10 @@ export function updateSetting(
     }
     case "contextScaleTokens": {
       next.contextScaleTokens = value === "model" ? null : validateContextScale(Number(value));
+      break;
+    }
+    case "endOfRunNotification": {
+      next.endOfRunNotification = value === "true";
       break;
     }
   }

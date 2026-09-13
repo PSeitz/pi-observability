@@ -318,6 +318,7 @@ export default function (pi: ExtensionAPI) {
       },
       contextZones: { expert: 70, warning: 85 },
       contextScaleTokens: null,
+      endOfRunNotification: true,
     },
   };
 
@@ -408,7 +409,7 @@ export default function (pi: ExtensionAPI) {
   pi.on("agent_end", async (event, ctx) => {
     state.isStreaming = false;
 
-    if (!ctx.hasUI || state.agentStartTime === null) {
+    if (!ctx.hasUI || state.agentStartTime === null || !state.settings.endOfRunNotification) {
       state.agentStartTime = null;
       return;
     }

@@ -64,6 +64,7 @@ Individual segments you can toggle:
 - **Session Tokens** — Total input/output
 - **TPS** — Live during streaming, last-turn when idle
 - **Cost** — Estimated session cost
+- **End-of-run TPS notification** — Can be enabled or disabled independently
 
 The context percentage scale is configurable. By default, 100% is the active model's context window; it can instead be fixed at 50k, 100k, or 200k tokens.
 

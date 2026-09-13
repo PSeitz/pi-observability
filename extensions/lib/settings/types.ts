@@ -19,6 +19,7 @@ export interface SettingsConfig {
   segments: Record<SegmentKey, boolean>;
   contextZones: { expert: number; warning: number };
   contextScaleTokens: number | null;
+  endOfRunNotification: boolean;
 }
 
 export interface SettingsListItem {
